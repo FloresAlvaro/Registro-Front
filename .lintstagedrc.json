@@ -1,0 +1,7 @@
+{
+  "src/**/*.ts": ["ng lint --fix", "prettier --write"],
+  "src/**/*.html": ["ng lint --fix", "prettier --write"],
+  "src/**/*.{scss,css}": ["prettier --write"],
+  "src/**/*.json": ["prettier --write"],
+  "*.{js,mjs}": ["prettier --write"]
+}
