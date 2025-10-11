@@ -7,11 +7,11 @@ Este proyecto utiliza Husky para automatizar tareas de calidad de código antes 
 ### Pre-commit
 
 - **Archivo**: `.husky/pre-commit`
-- **Acción**: Ejecuta `lint-staged`
+- **Acción**: Ejecuta `npm run lint && npx lint-staged`
 - **Función**:
-  - Lint y corrige archivos TypeScript y HTML
-  - Formatea código con Prettier
-  - Solo procesa archivos en staging
+  - Ejecuta linting completo del proyecto
+  - Formatea archivos en staging con Prettier
+  - Solo procesa archivos en staging para formateo
 
 ### Pre-push
 
