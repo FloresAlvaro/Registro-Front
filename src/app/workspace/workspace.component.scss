@@ -1,30 +1,146 @@
+@use "../../styles/index" as *;
+
 .workspace-container {
-  padding: 2rem;
-  max-width: 1400px;
-  margin: 0 auto;
-  font-family: "Lato", sans-serif;
-  background-color: #f5f7fa;
-  min-height: 100vh;
+  @include container-main;
 }
 
 .workspace-header {
-  margin-bottom: 3rem;
+  margin-bottom: $spacing-2xl;
   text-align: center;
-  padding: 2rem;
-  background: #1e88e5;
-  border-radius: 12px;
-  color: white;
+  @include header-base;
+  border-radius: $border-radius-base;
 
   .workspace-title {
-    font-size: 2.8rem;
-    font-weight: bold;
-    margin: 0 0 0.5rem 0;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-xs 0;
   }
 
   .workspace-subtitle {
-    font-size: 1.2rem;
+    font-size: $font-size-lg;
     opacity: 0.9;
     margin: 0;
+  }
+}
+
+.workspace-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+}
+
+.workspace-section {
+  .section-title {
+    @include section-title;
+  }
+}
+
+.cards-grid {
+  @include cards-grid;
+}
+
+.workspace-card {
+  @include card-base;
+
+  .card-icon {
+    font-size: 2.5rem;
+    margin-bottom: $spacing-base;
+    display: block;
+  }
+
+  h4 {
+    font-size: $font-size-xl;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    margin: 0 0 $spacing-base 0;
+  }
+
+  p {
+    @include text-muted;
+    margin: 0 0 $spacing-lg 0;
+    line-height: 1.6;
+    font-size: $font-size-base;
+  }
+
+  .card-actions {
+    display: flex;
+    gap: $spacing-sm;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+@include mobile {
+  .workspace-container {
+    padding: $spacing-base;
+  }
+
+  .workspace-header {
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    .workspace-title {
+      font-size: 2.2rem;
+    }
+
+    .workspace-subtitle {
+      font-size: $font-size-base;
+    }
+  }
+
+  .cards-grid {
+    grid-template-columns: 1fr;
+    gap: $spacing-base;
+  }
+
+  .workspace-card {
+    padding: $spacing-lg;
+
+    .card-actions {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn-primary,
+    .btn-secondary {
+      width: 120px;
+      min-width: 120px;
+      height: 44px;
+    }
+  }
+
+  .workspace-content {
+    gap: $spacing-xl;
+  }
+
+  .workspace-section .section-title {
+    font-size: 1.5rem;
+  }
+}
+
+@include mobile-small {
+  .workspace-header .workspace-title {
+    font-size: 1.8rem;
+  }
+
+  .workspace-card {
+    padding: $spacing-base;
+
+    .card-icon {
+      font-size: 2rem;
+    }
+
+    h4 {
+      font-size: $font-size-lg;
+    }
   }
 }
 

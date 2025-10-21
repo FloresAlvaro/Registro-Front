@@ -1,0 +1,154 @@
+// ====================================
+// MIXINS REUTILIZABLES
+// ====================================
+
+@use "variables" as *;
+
+// Mixin para botones base
+@mixin button-base {
+  padding: 0.8rem 1.5rem;
+  border: none;
+  border-radius: $border-radius-sm;
+  font-size: $font-size-sm;
+  font-weight: $font-weight-medium;
+  font-family: $font-family;
+  cursor: pointer;
+  transition: $transition-fast;
+  text-decoration: none;
+  display: inline-block;
+  text-align: center;
+  min-width: 120px;
+  width: 120px;
+  height: 44px;
+  line-height: 1.2;
+}
+
+// Mixin para botón primario
+@mixin button-primary {
+  @include button-base;
+  background: $primary-color;
+  color: $text-light;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: $shadow-button;
+    background: $primary-dark;
+  }
+}
+
+// Mixin para botón secundario
+@mixin button-secondary {
+  @include button-base;
+  background: transparent;
+  color: $secondary-color;
+  border: 2px solid $secondary-color;
+
+  &:hover {
+    background: $secondary-color;
+    color: $text-light;
+    transform: translateY(-1px);
+  }
+}
+
+// Mixin para tarjetas
+@mixin card-base {
+  background: $background-card;
+  border-radius: $border-radius-base;
+  padding: $spacing-xl;
+  box-shadow: $shadow-light;
+  border: 1px solid $border-light;
+  transition: $transition-medium;
+  position: relative;
+  overflow: hidden;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: $shadow-medium;
+  }
+
+  &::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: $primary-color;
+  }
+}
+
+// Mixin para títulos de sección
+@mixin section-title {
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  margin-bottom: $spacing-lg;
+  padding-bottom: $spacing-xs;
+  border-bottom: 3px solid $primary-color;
+  display: inline-block;
+  font-family: $font-family;
+}
+
+// Mixin para contenedores principales
+@mixin container-main {
+  padding: $spacing-xl;
+  max-width: $breakpoint-xl;
+  margin: 0 auto;
+  font-family: $font-family;
+  background-color: $background-main;
+  min-height: 100vh;
+}
+
+// Mixin para headers/topbars
+@mixin header-base {
+  background-color: $primary-color;
+  color: $text-light;
+  font-family: $font-family;
+  padding: $spacing-lg;
+}
+
+// Mixin para grid de tarjetas
+@mixin cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: $spacing-lg;
+}
+
+// Mixin para centrar contenido flex
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+// Mixin para reset de elementos
+@mixin reset-element {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+// Mixins para responsive design
+@mixin mobile-small {
+  @media (max-width: $breakpoint-sm) {
+    @content;
+  }
+}
+
+@mixin mobile {
+  @media (max-width: $breakpoint-md) {
+    @content;
+  }
+}
+
+@mixin tablet {
+  @media (max-width: $breakpoint-lg) {
+    @content;
+  }
+}
+
+// Mixin para texto con opacidad
+@mixin text-muted($opacity: 0.8) {
+  color: $text-primary;
+  opacity: $opacity;
+}

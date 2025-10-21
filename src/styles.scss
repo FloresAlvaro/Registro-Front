@@ -1,5 +1,8 @@
 /* You can add global styles to this file, and also import other style files */
 
+/* Import variables and mixins */
+@use "styles/index" as *;
+
 /* Import PrimeIcons */
 @import "primeicons/primeicons.css";
 
@@ -8,20 +11,17 @@
 
 /* CSS Reset para eliminar espacios en blanco por defecto */
 * {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  @include reset-element;
 }
 
 html,
 body {
-  margin: 0;
-  padding: 0;
+  @include reset-element;
   width: 100%;
   height: 100%;
-  font-family: "Lato", sans-serif;
+  font-family: $font-family;
 }
 
 body {
-  background-color: #f8f9fa;
+  background-color: $background-main;
 }

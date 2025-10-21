@@ -1,0 +1,78 @@
+// ====================================
+// VARIABLES GLOBALES - PALETA DE COLORES
+// ====================================
+
+// Colores principales
+$primary-color: #1e88e5; // Azul medio
+$primary-dark: #1976d2; // Azul medio oscuro (hover)
+$secondary-color: #43a047; // Verde menta
+$secondary-dark: #388e3c; // Verde menta oscuro (hover)
+
+// Colores de fondo
+$background-main: #f5f7fa; // Gris claro
+$background-card: #ffffff; // Blanco
+$background-overlay: rgba(0, 0, 0, 0.08);
+
+// Colores de texto
+$text-primary: #263238; // Gris oscuro
+$text-secondary: rgba(38, 50, 56, 0.8); // Gris oscuro con opacidad
+$text-light: #ffffff; // Blanco
+
+// Colores de estado
+$success-color: #81c784; // Verde claro
+$error-color: #e57373; // Rojo suave
+$warning-color: #ffb74d; // Naranja suave
+
+// Colores de borde
+$border-light: #e9ecef;
+$border-primary: $primary-color;
+
+// ====================================
+// VARIABLES DE DISEÑO
+// ====================================
+
+// Tipografía
+$font-family: "Lato", sans-serif;
+$font-size-xs: 0.75rem;
+$font-size-sm: 0.9rem;
+$font-size-base: 0.95rem;
+$font-size-lg: 1.2rem;
+$font-size-xl: 1.4rem;
+$font-size-2xl: 1.8rem;
+$font-size-3xl: 2.8rem;
+
+$font-weight-normal: 400;
+$font-weight-medium: 500;
+$font-weight-bold: 700;
+
+// Espaciado
+$spacing-xs: 0.5rem;
+$spacing-sm: 0.75rem;
+$spacing-base: 1rem;
+$spacing-lg: 1.5rem;
+$spacing-xl: 2rem;
+$spacing-2xl: 3rem;
+
+// Border radius
+$border-radius-sm: 6px;
+$border-radius-base: 12px;
+
+// Sombras
+$shadow-light: 0 4px 12px rgba(0, 0, 0, 0.08);
+$shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.15);
+$shadow-button: 0 4px 12px rgba(30, 136, 229, 0.4);
+
+// Transiciones
+$transition-fast: all 0.2s ease;
+$transition-medium: all 0.3s ease;
+
+// Breakpoints
+$breakpoint-sm: 480px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1400px;
+
+// Z-index
+$z-index-topbar: 1000;
+$z-index-modal: 2000;
+$z-index-overlay: 3000;
