@@ -3,7 +3,7 @@
   max-width: 1400px;
   margin: 0 auto;
   font-family: "Lato", sans-serif;
-  background-color: #f8f9fa;
+  background-color: #f5f7fa;
   min-height: 100vh;
 }
 
@@ -11,7 +11,7 @@
   margin-bottom: 3rem;
   text-align: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1e88e5;
   border-radius: 12px;
   color: white;
 
@@ -38,10 +38,10 @@
   .section-title {
     font-size: 1.8rem;
     font-weight: bold;
-    color: #333;
+    color: #263238;
     margin-bottom: 1.5rem;
     padding-bottom: 0.5rem;
-    border-bottom: 3px solid #667eea;
+    border-bottom: 3px solid #1e88e5;
     display: inline-block;
   }
 }
@@ -74,7 +74,7 @@
     left: 0;
     right: 0;
     height: 4px;
-    background: linear-gradient(90deg, #667eea, #764ba2);
+    background: #1e88e5;
   }
 
   .card-icon {
@@ -86,15 +86,16 @@
   h4 {
     font-size: 1.4rem;
     font-weight: bold;
-    color: #333;
+    color: #263238;
     margin: 0 0 1rem 0;
   }
 
   p {
-    color: #666;
+    color: #263238;
     margin: 0 0 1.5rem 0;
     line-height: 1.6;
     font-size: 0.95rem;
+    opacity: 0.8;
   }
 
   .card-actions {
@@ -124,22 +125,23 @@
 }
 
 .btn-primary {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #1e88e5;
   color: white;
 
   &:hover {
     transform: translateY(-1px);
-    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    box-shadow: 0 4px 12px rgba(30, 136, 229, 0.4);
+    background: #1976d2;
   }
 }
 
 .btn-secondary {
   background: transparent;
-  color: #667eea;
-  border: 2px solid #667eea;
+  color: #43a047;
+  border: 2px solid #43a047;
 
   &:hover {
-    background: #667eea;
+    background: #43a047;
     color: white;
     transform: translateY(-1px);
   }
