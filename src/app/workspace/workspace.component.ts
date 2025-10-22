@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-workspace',
@@ -6,4 +7,10 @@ import { Component } from '@angular/core';
   templateUrl: './workspace.component.html',
   styleUrl: './workspace.component.scss',
 })
-export class WorkspaceComponent {}
+export class WorkspaceComponent {
+  private router = inject(Router);
+
+  navigateToRoles() {
+    this.router.navigate(['/roles']);
+  }
+}

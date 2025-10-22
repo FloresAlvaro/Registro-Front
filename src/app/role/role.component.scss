@@ -1,0 +1,100 @@
+@use "../../styles/index" as *;
+
+.role-container {
+  @include container-main;
+}
+
+.role-header {
+  margin-bottom: $spacing-2xl;
+  text-align: center;
+  @include header-base;
+  border-radius: $border-radius-base;
+  position: relative;
+
+  .header-navigation {
+    position: absolute;
+    top: $spacing-base;
+    left: $spacing-base;
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.2);
+      color: $text-light;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      padding: $spacing-xs $spacing-base;
+      border-radius: $border-radius-sm;
+      font-size: $font-size-sm;
+      cursor: pointer;
+      transition: $transition-fast;
+
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+        transform: translateX(-2px);
+      }
+    }
+  }
+
+  .role-title {
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+    margin: 0 0 $spacing-xs 0;
+  }
+
+  .role-subtitle {
+    font-size: $font-size-lg;
+    opacity: 0.9;
+    margin: 0;
+  }
+}
+
+.role-content {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-2xl;
+}
+
+.role-actions {
+  display: flex;
+  gap: $spacing-base;
+  justify-content: center;
+
+  .btn-primary {
+    @include button-primary;
+  }
+
+  .btn-secondary {
+    @include button-secondary;
+  }
+}
+
+.roles-list {
+  background: $background-card;
+  border-radius: $border-radius-base;
+  padding: $spacing-xl;
+  box-shadow: $shadow-light;
+  text-align: center;
+  color: $text-secondary;
+}
+
+@include mobile {
+  .role-container {
+    padding: $spacing-base;
+  }
+
+  .role-header {
+    padding: $spacing-lg;
+    margin-bottom: $spacing-xl;
+
+    .role-title {
+      font-size: 2.2rem;
+    }
+
+    .role-subtitle {
+      font-size: $font-size-base;
+    }
+  }
+
+  .role-actions {
+    flex-direction: column;
+    align-items: center;
+  }
+}

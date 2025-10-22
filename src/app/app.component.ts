@@ -1,11 +1,10 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { TopbarComponent } from './topbar/topbar.component';
-import { WorkspaceComponent } from './workspace/workspace.component';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, TopbarComponent, WorkspaceComponent],
+  imports: [RouterOutlet, TopbarComponent],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss',
 })
