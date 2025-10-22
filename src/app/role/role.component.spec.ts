@@ -1,5 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-
+import { Router } from '@angular/router';
 import { RoleComponent } from './role.component';
 
 describe('RoleComponent', () => {
@@ -9,6 +9,14 @@ describe('RoleComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       imports: [RoleComponent],
+      providers: [
+        {
+          provide: Router,
+          useValue: {
+            navigate: jasmine.createSpy('navigate'),
+          },
+        },
+      ],
     }).compileComponents();
 
     fixture = TestBed.createComponent(RoleComponent);
@@ -18,5 +26,11 @@ describe('RoleComponent', () => {
 
   it('should create', () => {
     expect(component).toBeTruthy();
+  });
+
+  it('should navigate back to workspace when goBack is called', () => {
+    const router = TestBed.inject(Router);
+    component.goBack();
+    expect(router.navigate).toHaveBeenCalledWith(['/workspace']);
   });
 });
