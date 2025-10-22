@@ -1,5 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 import { RoleComponent } from './role.component';
 
 describe('RoleComponent', () => {
@@ -14,6 +16,12 @@ describe('RoleComponent', () => {
           provide: Router,
           useValue: {
             navigate: jasmine.createSpy('navigate'),
+          },
+        },
+        {
+          provide: HttpClient,
+          useValue: {
+            get: jasmine.createSpy('get').and.returnValue(of([])),
           },
         },
       ],
