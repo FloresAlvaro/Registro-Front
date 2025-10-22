@@ -52,10 +52,17 @@
   gap: $spacing-2xl;
 }
 
+.role-controls {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: $spacing-base;
+  flex-wrap: wrap;
+}
+
 .role-actions {
   display: flex;
   gap: $spacing-base;
-  justify-content: center;
 
   .btn-primary {
     @include button-primary;
@@ -66,13 +73,230 @@
   }
 }
 
+.role-filters {
+  .filter-dropdown {
+    position: relative;
+    display: inline-block;
+
+    .dropdown-button {
+      background: $background-card;
+      border: 2px solid $border-light;
+      border-radius: $border-radius-sm;
+      padding: $spacing-xs $spacing-base;
+      font-size: $font-size-sm;
+      cursor: pointer;
+      transition: $transition-fast;
+      display: flex;
+      align-items: center;
+      gap: $spacing-xs;
+      min-width: 160px;
+      justify-content: space-between;
+
+      &:hover,
+      &.active {
+        border-color: $primary-color;
+        box-shadow: 0 0 0 3px rgba(30, 136, 229, 0.1);
+      }
+
+      .dropdown-text {
+        color: $text-primary;
+        font-weight: $font-weight-medium;
+      }
+
+      .pi-chevron-down {
+        color: $text-secondary;
+        transition: transform 0.2s ease;
+        font-size: 0.8rem;
+
+        &.rotated {
+          transform: rotate(180deg);
+        }
+      }
+    }
+
+    .dropdown-menu {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      background: $background-card;
+      border: 1px solid $border-light;
+      border-radius: $border-radius-sm;
+      box-shadow: $shadow-medium;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px);
+      transition: all 0.2s ease;
+
+      &.show {
+        opacity: 1;
+        visibility: visible;
+        transform: translateY(0);
+      }
+
+      .dropdown-item {
+        width: 100%;
+        padding: $spacing-sm $spacing-base;
+        border: none;
+        background: transparent;
+        text-align: left;
+        cursor: pointer;
+        transition: $transition-fast;
+        display: flex;
+        align-items: center;
+        gap: $spacing-xs;
+
+        &:hover {
+          background: rgba(30, 136, 229, 0.1);
+        }
+
+        &.selected {
+          background: rgba(30, 136, 229, 0.15);
+          color: $primary-color;
+          font-weight: $font-weight-medium;
+        }
+
+        &:first-child {
+          border-radius: $border-radius-sm $border-radius-sm 0 0;
+        }
+
+        &:last-child {
+          border-radius: 0 0 $border-radius-sm $border-radius-sm;
+        }
+
+        .pi {
+          font-size: 0.9rem;
+        }
+      }
+    }
+  }
+}
+
 .roles-list {
-  background: $background-card;
-  border-radius: $border-radius-base;
-  padding: $spacing-xl;
-  box-shadow: $shadow-light;
-  text-align: center;
-  color: $text-secondary;
+  .loading {
+    @include flex-center;
+    flex-direction: column;
+    gap: $spacing-base;
+    padding: $spacing-2xl;
+    color: $text-secondary;
+
+    .pi-spinner {
+      font-size: 2rem;
+      color: $primary-color;
+    }
+  }
+
+  .roles-grid {
+    @include cards-grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  }
+
+  .role-card {
+    @include card-base;
+    padding: $spacing-lg;
+
+    .role-status {
+      position: absolute;
+      top: $spacing-base;
+      right: $spacing-base;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      @include flex-center;
+
+      &.status-active {
+        background: rgba(129, 199, 132, 0.2);
+        color: $success-color;
+      }
+
+      &.status-inactive {
+        background: rgba(229, 115, 115, 0.2);
+        color: $error-color;
+      }
+
+      .pi {
+        font-size: 0.9rem;
+      }
+    }
+
+    h4 {
+      font-size: $font-size-xl;
+      font-weight: $font-weight-bold;
+      color: $text-primary;
+      margin: 0 0 $spacing-xs 0;
+      padding-right: 40px; // Space for status icon
+    }
+
+    p {
+      @include text-muted;
+      margin: 0 0 $spacing-base 0;
+      line-height: 1.5;
+      font-size: $font-size-sm;
+    }
+
+    .role-permissions {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: $spacing-xs;
+      border-top: 1px solid $border-light;
+
+      .permission-count {
+        font-size: $font-size-xs;
+        color: $text-secondary;
+        background: rgba(30, 136, 229, 0.1);
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-weight: $font-weight-medium;
+      }
+
+      .role-status-text {
+        font-size: $font-size-xs;
+        font-weight: $font-weight-medium;
+        padding: 2px 8px;
+        border-radius: 12px;
+
+        &.text-active {
+          color: $success-color;
+          background: rgba(129, 199, 132, 0.1);
+        }
+
+        &.text-inactive {
+          color: $error-color;
+          background: rgba(229, 115, 115, 0.1);
+        }
+      }
+    }
+  }
+
+  .empty-state {
+    @include flex-center;
+    flex-direction: column;
+    gap: $spacing-base;
+    padding: $spacing-2xl;
+    color: $text-secondary;
+    background: $background-card;
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-light;
+
+    .pi-inbox {
+      font-size: 3rem;
+      opacity: 0.5;
+    }
+
+    h3 {
+      margin: 0;
+      color: $text-primary;
+      font-size: $font-size-xl;
+    }
+
+    p {
+      margin: 0;
+      text-align: center;
+      max-width: 300px;
+    }
+  }
 }
 
 @include mobile {
@@ -84,6 +308,13 @@
     padding: $spacing-lg;
     margin-bottom: $spacing-xl;
 
+    .header-navigation {
+      .btn-back {
+        font-size: $font-size-xs;
+        padding: $spacing-xs;
+      }
+    }
+
     .role-title {
       font-size: 2.2rem;
     }
@@ -93,8 +324,30 @@
     }
   }
 
+  .role-controls {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-lg;
+  }
+
   .role-actions {
     flex-direction: column;
     align-items: center;
+  }
+
+  .role-filters {
+    .filter-dropdown {
+      width: 100%;
+
+      .dropdown-button {
+        width: 100%;
+      }
+    }
+  }
+
+  .roles-list {
+    .roles-grid {
+      grid-template-columns: 1fr;
+    }
   }
 }

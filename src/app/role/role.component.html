@@ -8,13 +8,76 @@
   </div>
 
   <div class="role-content">
-    <div class="role-actions">
-      <button class="btn-primary">Crear Nuevo Rol</button>
-      <button class="btn-secondary">Importar Roles</button>
+    <div class="role-controls">
+      <div class="role-actions">
+        <button class="btn-primary">Crear Nuevo Rol</button>
+        <button class="btn-secondary">Importar Roles</button>
+      </div>
+
+      <div class="role-filters">
+        <div class="filter-dropdown">
+          <button class="dropdown-button" (click)="toggleDropdown()" [class.active]="isDropdownOpen">
+            <span class="dropdown-text">{{ selectedFilterLabel }}</span>
+            <i class="pi pi-chevron-down" [class.rotated]="isDropdownOpen"></i>
+          </button>
+
+          <div class="dropdown-menu" [class.show]="isDropdownOpen">
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'all'"
+              (click)="selectFilter('all', 'Todos los roles')"
+            >
+              <i class="pi pi-list"></i>
+              <span>Todos los roles</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'active'"
+              (click)="selectFilter('active', 'Roles activos')"
+            >
+              <i class="pi pi-check-circle"></i>
+              <span>Roles activos</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'inactive'"
+              (click)="selectFilter('inactive', 'Roles inactivos')"
+            >
+              <i class="pi pi-times-circle"></i>
+              <span>Roles inactivos</span>
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="roles-list">
-      <p>Lista de roles aparecerá aquí...</p>
+      <div class="loading" *ngIf="isLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Cargando roles...</span>
+      </div>
+
+      <div class="roles-grid" *ngIf="!isLoading && roles.length > 0">
+        <div class="role-card" *ngFor="let role of roles">
+          <div class="role-status" [class]="role.roleStatus ? 'status-active' : 'status-inactive'">
+            <i class="pi" [class]="getStatusIcon(role.roleStatus)"></i>
+          </div>
+          <h4>{{ role.roleName }}</h4>
+          <p>{{ role.description || 'Sin descripción disponible' }}</p>
+          <div class="role-permissions">
+            <span class="permission-count">{{ role.permissions?.length || 0 }} permisos</span>
+            <span class="role-status-text" [class]="role.roleStatus ? 'text-active' : 'text-inactive'">
+              {{ role.roleStatus ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && roles.length === 0">
+        <i class="pi pi-inbox"></i>
+        <h3>No se encontraron roles</h3>
+        <p>No hay roles disponibles con el filtro seleccionado.</p>
+      </div>
     </div>
   </div>
 </div>
