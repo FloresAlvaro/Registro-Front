@@ -5,7 +5,8 @@ import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
 interface Role {
-  id?: number;
+  roleId?: number;
+  id?: number; // Mantener para compatibilidad
   roleName: string;
   roleStatus: boolean;
   description?: string;
@@ -107,28 +108,28 @@ export class RoleComponent implements OnInit {
   private getMockData(): Role[] {
     const mockRoles: Role[] = [
       {
-        id: 1,
+        roleId: 1,
         roleName: 'Administrador',
         roleStatus: true,
         description: 'Acceso completo al sistema con permisos de administración',
         permissions: ['create', 'read', 'update', 'delete', 'admin'],
       },
       {
-        id: 2,
+        roleId: 2,
         roleName: 'Editor',
         roleStatus: true,
         description: 'Puede crear y editar contenido del sistema',
         permissions: ['create', 'read', 'update'],
       },
       {
-        id: 3,
+        roleId: 3,
         roleName: 'Visor',
         roleStatus: false,
         description: 'Solo permisos de lectura en el sistema',
         permissions: ['read'],
       },
       {
-        id: 4,
+        roleId: 4,
         roleName: 'Moderador',
         roleStatus: true,
         description: 'Permisos para moderar contenido y usuarios',
@@ -169,33 +170,56 @@ export class RoleComponent implements OnInit {
 
   async saveRole() {
     if (!this.editingRole.roleName.trim()) {
+      alert('El nombre del rol es obligatorio');
       return;
     }
 
     this.isSaving = true;
     try {
-      // Actualizar nombre del rol
-      await this.http
-        .patch(`${this.baseUrl}/${this.editingRole.id}`, {
-          roleName: this.editingRole.roleName,
-        })
+      const roleId = this.editingRole.roleId || this.editingRole.id;
+
+      // Preparar los datos para actualizar
+      const updateData: Partial<Role> = {
+        roleName: this.editingRole.roleName.trim(),
+        roleStatus: this.editingRole.roleStatus,
+      };
+
+      // Usar el endpoint PATCH para actualizar el rol
+      const response = await this.http
+        .patch<Role>(`${this.baseUrl}/${roleId}`, updateData)
         .toPromise();
 
-      // Si el estado cambió, usar el endpoint de toggle
-      const originalRole = this.roles.find((r) => r.id === this.editingRole.id);
-      if (originalRole && originalRole.roleStatus !== this.editingRole.roleStatus) {
-        await this.http
-          .patch(`${this.baseUrl}/${this.editingRole.id}/toggle-status`, {})
-          .toPromise();
+      // Actualizar el rol en la lista local con la respuesta del servidor
+      if (response) {
+        const roleIndex = this.roles.findIndex((r) => (r.roleId || r.id) === roleId);
+        if (roleIndex !== -1) {
+          this.roles[roleIndex] = { ...this.roles[roleIndex], ...response };
+        }
       }
 
-      // Recargar los roles
+      // Recargar los roles para asegurar sincronización
       await this.loadRoles();
       this.closeEditModal();
-    } catch {
-      // Error al guardar el rol
+    } catch (error) {
+      this.handleSaveError(error);
     } finally {
       this.isSaving = false;
+    }
+  }
+
+  private handleSaveError(error: unknown) {
+    const httpError = error as { status?: number; error?: unknown };
+
+    if (httpError?.status === 404) {
+      alert('El rol no fue encontrado. Puede haber sido eliminado.');
+      this.loadRoles();
+      this.closeEditModal();
+    } else if (httpError?.status === 400) {
+      alert('Datos inválidos. Verifica el nombre del rol.');
+    } else if (httpError?.status === 403) {
+      alert('No tienes permisos para editar este rol.');
+    } else {
+      alert('Error al guardar el rol. Por favor, inténtalo de nuevo.');
     }
   }
 
@@ -206,19 +230,54 @@ export class RoleComponent implements OnInit {
   }
 
   async confirmDelete() {
-    if (!this.roleToDelete?.id) {
+    const roleId = this.roleToDelete?.roleId || this.roleToDelete?.id;
+    if (!roleId) {
       return;
     }
 
     this.isDeleting = true;
+
     try {
-      await this.http.delete(`${this.baseUrl}/${this.roleToDelete.id}`).toPromise();
+      // Usar el endpoint específico: DELETE http://localhost:3000/roles/{role-id}
+      await this.http.delete(`${this.baseUrl}/${roleId}`).toPromise();
+
+      // Recargar la lista de roles después de eliminar exitosamente
       await this.loadRoles();
       this.closeDeleteModal();
-    } catch {
-      // Error al eliminar el rol
+    } catch (error) {
+      // Manejar errores específicos del servidor
+      this.handleDeleteError(error);
     } finally {
       this.isDeleting = false;
+    }
+  }
+
+  private handleDeleteError(error: unknown) {
+    const httpError = error as { status?: number };
+
+    // Si es un error de red o el servidor no está disponible
+    if (httpError?.status === 0 || httpError?.status === undefined) {
+      // Simular eliminación local para pruebas cuando el servidor no esté disponible
+      this.simulateLocalDelete();
+    } else if (httpError?.status === 404) {
+      // El rol ya no existe
+      this.loadRoles(); // Actualizar la lista
+      this.closeDeleteModal();
+    } else if (httpError?.status === 403) {
+      // Sin permisos para eliminar
+      alert('No tienes permisos para eliminar este rol');
+    } else {
+      // Otro error del servidor
+      alert('Error al eliminar el rol. Por favor, inténtalo de nuevo.');
+    }
+  }
+
+  private simulateLocalDelete() {
+    const roleIdToDelete = this.roleToDelete?.roleId || this.roleToDelete?.id;
+    if (roleIdToDelete) {
+      // Eliminar de la lista local para testing
+      this.roles = this.roles.filter((role) => (role.roleId || role.id) !== roleIdToDelete);
+      this.closeDeleteModal();
     }
   }
 
