@@ -82,10 +82,10 @@
 
             <div class="table-cell actions">
               <div class="action-buttons">
-                <button class="btn-action btn-edit" data-tooltip="Editar rol" (click)="editRole(role)">
+                <button class="btn-action btn-edit" data-tooltip="Editar" (click)="editRole(role)">
                   <i class="pi pi-pencil"></i>
                 </button>
-                <button class="btn-action btn-delete" data-tooltip="Eliminar rol" (click)="deleteRole(role)">
+                <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="deleteRole(role)">
                   <i class="pi pi-trash"></i>
                 </button>
               </div>
@@ -99,6 +99,91 @@
         <h3>No se encontraron roles</h3>
         <p>No hay roles disponibles con el filtro seleccionado.</p>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar rol -->
+<div
+  class="modal-overlay"
+  *ngIf="isEditModalOpen"
+  (click)="closeEditModal()"
+  (keyup.escape)="closeEditModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Editar Rol</h3>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="roleName">Nombre del Rol:</label>
+        <input
+          type="text"
+          id="roleName"
+          [(ngModel)]="editingRole.roleName"
+          class="form-input"
+          placeholder="Ingrese el nombre del rol"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="editingRole.roleStatus" class="toggle-input" />
+          <span class="toggle-slider"></span>
+          Estado: {{ editingRole.roleStatus ? 'Activo' : 'Inactivo' }}
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveRole()" [disabled]="isSaving">
+        <span *ngIf="!isSaving">Guardar</span>
+        <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner"></i> Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div
+  class="modal-overlay"
+  *ngIf="isDeleteModalOpen"
+  (click)="closeDeleteModal()"
+  (keyup.escape)="closeDeleteModal()"
+  tabindex="0"
+>
+  <div
+    class="modal-content delete-modal"
+    (click)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+    tabindex="0"
+  >
+    <div class="modal-header">
+      <h3>Confirmar Eliminación</h3>
+      <button class="modal-close" (click)="closeDeleteModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        ¿Estás seguro de que deseas eliminar el rol <strong>"{{ roleToDelete?.roleName }}"</strong>?
+      </p>
+      <p class="warning-text">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+      <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Eliminar</span>
+        <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
+      </button>
     </div>
   </div>
 </div>

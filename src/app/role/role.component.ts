@@ -2,6 +2,7 @@ import { Component, inject, OnInit, HostListener } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { FormsModule } from '@angular/forms';
 
 interface Role {
   id?: number;
@@ -13,7 +14,7 @@ interface Role {
 
 @Component({
   selector: 'app-role',
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './role.component.html',
   styleUrl: './role.component.scss',
 })
@@ -31,6 +32,16 @@ export class RoleComponent implements OnInit {
   // Datos
   roles: Role[] = [];
   isLoading = false;
+
+  // Modal de edición
+  isEditModalOpen = false;
+  editingRole: Role = { roleName: '', roleStatus: false };
+  isSaving = false;
+
+  // Modal de eliminación
+  isDeleteModalOpen = false;
+  roleToDelete: Role | null = null;
+  isDeleting = false;
 
   // URL base del endpoint
   private readonly baseUrl = 'http://localhost:3000/roles';
@@ -140,14 +151,75 @@ export class RoleComponent implements OnInit {
   }
 
   // Acciones de los botones
-  editRole(_role: Role) {
-    // TODO: Implementar edición de rol
-    // Navegará a un formulario de edición o abrirá un modal
+  editRole(role: Role) {
+    this.editingRole = { ...role };
+    this.isEditModalOpen = true;
   }
 
-  deleteRole(_role: Role) {
-    // TODO: Implementar eliminación de rol
-    // Mostrará confirmación y realizará la eliminación
+  deleteRole(role: Role) {
+    this.roleToDelete = role;
+    this.isDeleteModalOpen = true;
+  }
+
+  // Métodos del modal de edición
+  closeEditModal() {
+    this.isEditModalOpen = false;
+    this.editingRole = { roleName: '', roleStatus: false };
+  }
+
+  async saveRole() {
+    if (!this.editingRole.roleName.trim()) {
+      return;
+    }
+
+    this.isSaving = true;
+    try {
+      // Actualizar nombre del rol
+      await this.http
+        .patch(`${this.baseUrl}/${this.editingRole.id}`, {
+          roleName: this.editingRole.roleName,
+        })
+        .toPromise();
+
+      // Si el estado cambió, usar el endpoint de toggle
+      const originalRole = this.roles.find((r) => r.id === this.editingRole.id);
+      if (originalRole && originalRole.roleStatus !== this.editingRole.roleStatus) {
+        await this.http
+          .patch(`${this.baseUrl}/${this.editingRole.id}/toggle-status`, {})
+          .toPromise();
+      }
+
+      // Recargar los roles
+      await this.loadRoles();
+      this.closeEditModal();
+    } catch {
+      // Error al guardar el rol
+    } finally {
+      this.isSaving = false;
+    }
+  }
+
+  // Métodos del modal de eliminación
+  closeDeleteModal() {
+    this.isDeleteModalOpen = false;
+    this.roleToDelete = null;
+  }
+
+  async confirmDelete() {
+    if (!this.roleToDelete?.id) {
+      return;
+    }
+
+    this.isDeleting = true;
+    try {
+      await this.http.delete(`${this.baseUrl}/${this.roleToDelete.id}`).toPromise();
+      await this.loadRoles();
+      this.closeDeleteModal();
+    } catch {
+      // Error al eliminar el rol
+    } finally {
+      this.isDeleting = false;
+    }
   }
 
   @HostListener('document:click', ['$event'])
