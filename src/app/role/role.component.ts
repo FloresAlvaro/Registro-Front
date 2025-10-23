@@ -139,6 +139,17 @@ export class RoleComponent implements OnInit {
     return roleStatus ? 'pi-check-circle' : 'pi-times-circle';
   }
 
+  // Acciones de los botones
+  editRole(_role: Role) {
+    // TODO: Implementar edición de rol
+    // Navegará a un formulario de edición o abrirá un modal
+  }
+
+  deleteRole(_role: Role) {
+    // TODO: Implementar eliminación de rol
+    // Mostrará confirmación y realizará la eliminación
+  }
+
   @HostListener('document:click', ['$event'])
   onDocumentClick(event: Event) {
     const target = event.target as HTMLElement;

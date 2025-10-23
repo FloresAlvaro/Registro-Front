@@ -10,8 +10,7 @@
   <div class="role-content">
     <div class="role-controls">
       <div class="role-actions">
-        <button class="btn-primary">Crear Nuevo Rol</button>
-        <button class="btn-secondary">Importar Roles</button>
+        <button class="btn-primary">Crear Rol</button>
       </div>
 
       <div class="role-filters">
@@ -57,18 +56,40 @@
         <span>Cargando roles...</span>
       </div>
 
-      <div class="roles-grid" *ngIf="!isLoading && roles.length > 0">
-        <div class="role-card" *ngFor="let role of roles">
-          <div class="role-status" [class]="role.roleStatus ? 'status-active' : 'status-inactive'">
-            <i class="pi" [class]="getStatusIcon(role.roleStatus)"></i>
-          </div>
-          <h4>{{ role.roleName }}</h4>
-          <p>{{ role.description || 'Sin descripción disponible' }}</p>
-          <div class="role-permissions">
-            <span class="permission-count">{{ role.permissions?.length || 0 }} permisos</span>
-            <span class="role-status-text" [class]="role.roleStatus ? 'text-active' : 'text-inactive'">
-              {{ role.roleStatus ? 'Activo' : 'Inactivo' }}
-            </span>
+      <div class="roles-table" *ngIf="!isLoading && roles.length > 0">
+        <div class="table-header">
+          <div class="header-cell name">Nombre del Rol</div>
+          <div class="header-cell status">Estado</div>
+          <div class="header-cell actions">Acciones</div>
+        </div>
+
+        <div class="table-body">
+          <div class="table-row" *ngFor="let role of roles">
+            <div class="table-cell name">
+              <div class="role-name-container">
+                <div class="role-status-icon" [class]="role.roleStatus ? 'status-active' : 'status-inactive'">
+                  <i class="pi" [class]="getStatusIcon(role.roleStatus)"></i>
+                </div>
+                <span class="role-name">{{ role.roleName }}</span>
+              </div>
+            </div>
+
+            <div class="table-cell status">
+              <span class="status-badge" [class]="role.roleStatus ? 'badge-active' : 'badge-inactive'">
+                {{ role.roleStatus ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+
+            <div class="table-cell actions">
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" data-tooltip="Editar rol" (click)="editRole(role)">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" data-tooltip="Eliminar rol" (click)="deleteRole(role)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </div>

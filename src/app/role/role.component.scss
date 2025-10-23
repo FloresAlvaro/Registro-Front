@@ -187,84 +187,192 @@
     }
   }
 
-  .roles-grid {
-    @include cards-grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  }
+  .roles-table {
+    background: $background-card;
+    border-radius: $border-radius-base;
+    box-shadow: $shadow-light;
+    overflow: hidden;
 
-  .role-card {
-    @include card-base;
-    padding: $spacing-lg;
+    .table-header {
+      display: grid;
+      grid-template-columns: 3fr 1fr 1fr;
+      gap: $spacing-base;
+      padding: $spacing-lg;
+      background: rgba(30, 136, 229, 0.05);
+      border-bottom: 1px solid $border-light;
 
-    .role-status {
-      position: absolute;
-      top: $spacing-base;
-      right: $spacing-base;
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-      @include flex-center;
-
-      &.status-active {
-        background: rgba(129, 199, 132, 0.2);
-        color: $success-color;
-      }
-
-      &.status-inactive {
-        background: rgba(229, 115, 115, 0.2);
-        color: $error-color;
-      }
-
-      .pi {
-        font-size: 0.9rem;
+      .header-cell {
+        font-weight: $font-weight-bold;
+        color: $text-primary;
+        font-size: $font-size-sm;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
       }
     }
 
-    h4 {
-      font-size: $font-size-xl;
-      font-weight: $font-weight-bold;
-      color: $text-primary;
-      margin: 0 0 $spacing-xs 0;
-      padding-right: 40px; // Space for status icon
-    }
+    .table-body {
+      .table-row {
+        display: grid;
+        grid-template-columns: 3fr 1fr 1fr;
+        gap: $spacing-base;
+        padding: $spacing-lg;
+        border-bottom: 1px solid $border-light;
+        transition: $transition-fast;
 
-    p {
-      @include text-muted;
-      margin: 0 0 $spacing-base 0;
-      line-height: 1.5;
-      font-size: $font-size-sm;
-    }
-
-    .role-permissions {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding-top: $spacing-xs;
-      border-top: 1px solid $border-light;
-
-      .permission-count {
-        font-size: $font-size-xs;
-        color: $text-secondary;
-        background: rgba(30, 136, 229, 0.1);
-        padding: 2px 8px;
-        border-radius: 12px;
-        font-weight: $font-weight-medium;
-      }
-
-      .role-status-text {
-        font-size: $font-size-xs;
-        font-weight: $font-weight-medium;
-        padding: 2px 8px;
-        border-radius: 12px;
-
-        &.text-active {
-          color: $success-color;
-          background: rgba(129, 199, 132, 0.1);
+        &:hover {
+          background: rgba(30, 136, 229, 0.02);
         }
 
-        &.text-inactive {
-          color: $error-color;
-          background: rgba(229, 115, 115, 0.1);
+        &:last-child {
+          border-bottom: none;
+        }
+
+        .table-cell {
+          display: flex;
+          align-items: center;
+
+          &.name .role-name-container {
+            display: flex;
+            align-items: center;
+            gap: $spacing-sm;
+
+            .role-status-icon {
+              width: 24px;
+              height: 24px;
+              border-radius: 50%;
+              @include flex-center;
+              flex-shrink: 0;
+
+              &.status-active {
+                background: rgba(129, 199, 132, 0.2);
+                color: $success-color;
+              }
+
+              &.status-inactive {
+                background: rgba(229, 115, 115, 0.2);
+                color: $error-color;
+              }
+
+              .pi {
+                font-size: 0.75rem;
+              }
+            }
+
+            .role-name {
+              font-weight: $font-weight-medium;
+              color: $text-primary;
+              font-size: $font-size-base;
+            }
+          }
+
+          &.status .status-badge {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: $font-size-xs;
+            font-weight: $font-weight-medium;
+
+            &.badge-active {
+              background: rgba(129, 199, 132, 0.15);
+              color: $success-color;
+            }
+
+            &.badge-inactive {
+              background: rgba(229, 115, 115, 0.15);
+              color: $error-color;
+            }
+          }
+
+          &.actions .action-buttons {
+            display: flex;
+            gap: $spacing-xs;
+
+            .btn-action {
+              width: 32px;
+              height: 32px;
+              border: none;
+              border-radius: $border-radius-sm;
+              cursor: pointer;
+              transition: $transition-fast;
+              @include flex-center;
+              position: relative;
+
+              .pi {
+                font-size: 0.75rem;
+              }
+
+              // Tooltip personalizado
+              &::after {
+                content: attr(data-tooltip);
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                background: rgba(0, 0, 0, 0.8);
+                color: white;
+                padding: 4px 8px;
+                border-radius: 4px;
+                font-size: 0.75rem;
+                white-space: nowrap;
+                opacity: 0;
+                visibility: hidden;
+                transition:
+                  opacity 0.3s,
+                  visibility 0.3s;
+                margin-bottom: 5px;
+                z-index: 1000;
+              }
+
+              &::before {
+                content: "";
+                position: absolute;
+                bottom: 100%;
+                left: 50%;
+                transform: translateX(-50%);
+                border: 4px solid transparent;
+                border-top-color: rgba(0, 0, 0, 0.8);
+                opacity: 0;
+                visibility: hidden;
+                transition:
+                  opacity 0.3s,
+                  visibility 0.3s;
+                margin-bottom: 1px;
+                z-index: 1000;
+              }
+
+              &:hover::after,
+              &:hover::before {
+                opacity: 1;
+                visibility: visible;
+              }
+
+              &.btn-edit {
+                background: rgba(30, 136, 229, 0.1);
+                color: $primary-color;
+
+                &:hover {
+                  background: rgba(30, 136, 229, 0.2);
+                }
+              }
+
+              &.btn-view {
+                background: rgba(129, 199, 132, 0.1);
+                color: $success-color;
+
+                &:hover {
+                  background: rgba(129, 199, 132, 0.2);
+                }
+              }
+
+              &.btn-delete {
+                background: rgba(229, 115, 115, 0.1);
+                color: $error-color;
+
+                &:hover {
+                  background: rgba(229, 115, 115, 0.2);
+                }
+              }
+            }
+          }
         }
       }
     }
@@ -346,8 +454,60 @@
   }
 
   .roles-list {
-    .roles-grid {
-      grid-template-columns: 1fr;
+    .roles-table {
+      .table-header {
+        display: none; // Ocultar header en móvil
+      }
+
+      .table-body .table-row {
+        display: block;
+        padding: $spacing-lg;
+        margin-bottom: $spacing-base;
+        background: $background-card;
+        border-radius: $border-radius-sm;
+        box-shadow: $shadow-light;
+
+        .table-cell {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: $spacing-xs 0;
+          border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+
+          &:last-child {
+            border-bottom: none;
+          }
+
+          &::before {
+            content: attr(data-label);
+            font-weight: $font-weight-bold;
+            color: $text-primary;
+            font-size: $font-size-xs;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            flex-shrink: 0;
+            width: 100px;
+          }
+
+          &.name {
+            &::before {
+              content: "Rol:";
+            }
+
+            .role-name-container {
+              justify-content: flex-end;
+            }
+          }
+
+          &.status::before {
+            content: "Estado:";
+          }
+
+          &.actions::before {
+            content: "Acciones:";
+          }
+        }
+      }
     }
   }
 }
