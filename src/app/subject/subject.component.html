@@ -1,0 +1,267 @@
+<div class="subject-container">
+  <div class="subject-header">
+    <div class="header-navigation">
+      <button class="btn-back" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+    </div>
+    <h2 class="subject-title">Gestión de Materias</h2>
+    <p class="subject-subtitle">Administra las materias del sistema académico</p>
+  </div>
+
+  <div class="subject-content">
+    <div class="subject-controls">
+      <div class="subject-actions">
+        <button class="btn-primary" (click)="openCreateModal()">Crear Materia</button>
+      </div>
+
+      <div class="subject-filters">
+        <div class="filter-dropdown">
+          <button class="dropdown-button" (click)="toggleDropdown()" [class.active]="isDropdownOpen">
+            <span class="dropdown-text">{{ selectedFilterLabel }}</span>
+            <i class="pi pi-chevron-down" [class.rotated]="isDropdownOpen"></i>
+          </button>
+
+          <div class="dropdown-menu" [class.show]="isDropdownOpen">
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'all'"
+              (click)="selectFilter('all', 'Todas las materias')"
+            >
+              <i class="pi pi-list"></i>
+              <span>Todas las materias</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'active'"
+              (click)="selectFilter('active', 'Materias activas')"
+            >
+              <i class="pi pi-check-circle"></i>
+              <span>Materias activas</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'inactive'"
+              (click)="selectFilter('inactive', 'Materias inactivas')"
+            >
+              <i class="pi pi-times-circle"></i>
+              <span>Materias inactivas</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="subjects-list">
+      <div class="loading" *ngIf="isLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Cargando materias...</span>
+      </div>
+
+      <div class="subjects-grid" *ngIf="!isLoading && subjects.length > 0">
+        <div class="subject-card" *ngFor="let subject of subjects">
+          <div class="card-header">
+            <div class="subject-status-icon" [class]="subject.subjectStatus ? 'status-active' : 'status-inactive'">
+              <i class="pi" [class]="getStatusIcon(subject.subjectStatus)"></i>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-edit" data-tooltip="Editar" (click)="editSubject(subject)">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="deleteSubject(subject)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="subject-title">{{ subject.subjectName }}</h3>
+            <p class="subject-description">{{ subject.subjectDescription }}</p>
+          </div>
+
+          <div class="card-footer">
+            <span class="status-badge" [class]="subject.subjectStatus ? 'badge-active' : 'badge-inactive'">
+              {{ subject.subjectStatus ? 'Activa' : 'Inactiva' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && subjects.length === 0">
+        <i class="pi pi-inbox"></i>
+        <h3>No se encontraron materias</h3>
+        <p>No hay materias disponibles con el filtro seleccionado.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar materia -->
+<div
+  class="modal-overlay"
+  *ngIf="isEditModalOpen"
+  (click)="closeEditModal()"
+  (keyup.escape)="closeEditModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Editar Materia</h3>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="subjectName">Materia:</label>
+        <input
+          type="text"
+          id="subjectName"
+          [(ngModel)]="editingSubject.subjectName"
+          class="form-input"
+          placeholder="Ej: Matemática, Lenguaje, Historia"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="subjectDescription">Descripción:</label>
+        <input
+          type="text"
+          id="subjectDescription"
+          [(ngModel)]="editingSubject.subjectDescription"
+          class="form-input"
+          placeholder="Descripción de la materia"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="editingSubject.subjectStatus" class="toggle-input" />
+          <span class="toggle-slider"></span>
+          <span>Materia activa</span>
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveSubject()" [disabled]="isSaving">
+        <span *ngIf="!isSaving">Guardar</span>
+        <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner"></i> Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para eliminar materia -->
+<div
+  class="modal-overlay"
+  *ngIf="isDeleteModalOpen"
+  (click)="closeDeleteModal()"
+  (keyup.escape)="closeDeleteModal()"
+  tabindex="0"
+>
+  <div
+    class="modal-content delete-modal"
+    (click)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+    tabindex="0"
+  >
+    <div class="modal-header">
+      <h3>Eliminar Materia</h3>
+      <button class="modal-close" (click)="closeDeleteModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        ¿Estás seguro de que deseas eliminar la materia <strong>"{{ subjectToDelete?.subjectName }}"</strong>?
+      </p>
+      <p class="warning-text">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+      <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Eliminar</span>
+        <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear materia -->
+<div
+  class="modal-overlay"
+  *ngIf="isCreateModalOpen"
+  (click)="closeCreateModal()"
+  (keyup.escape)="closeCreateModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Crear Nueva Materia</h3>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="newSubjectName">Materia:</label>
+        <input
+          type="text"
+          id="newSubjectName"
+          [(ngModel)]="newSubject.subjectName"
+          class="form-input"
+          placeholder="Ej: Matemática, Lenguaje, Historia"
+          (keyup.enter)="createSubject()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="newSubjectDescription">Descripción:</label>
+        <input
+          type="text"
+          id="newSubjectDescription"
+          [(ngModel)]="newSubject.subjectDescription"
+          class="form-input"
+          placeholder="Descripción de la materia"
+          (keyup.enter)="createSubject()"
+        />
+      </div>
+
+      <div class="form-group">
+        <div class="info-message">
+          <i class="pi pi-info-circle"></i>
+          <span>Las nuevas materias se crean como activas por defecto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+      <button
+        class="btn-primary"
+        (click)="createSubject()"
+        [disabled]="isCreating || !newSubject.subjectName.trim() || !newSubject.subjectDescription.trim()"
+      >
+        <span *ngIf="!isCreating">Crear Materia</span>
+        <span *ngIf="isCreating"><i class="pi pi-spin pi-spinner"></i> Creando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container" [class.show]="showToast">
+  <div class="toast" [class]="'toast-' + toastType">
+    <i class="pi toast-icon" [class]="getToastIcon()"></i>
+    <span class="toast-content">{{ toastMessage }}</span>
+    <button class="toast-close" (click)="hideToast()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+</div>

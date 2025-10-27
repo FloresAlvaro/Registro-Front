@@ -50,14 +50,22 @@
           <h4>Materias</h4>
           <p>Configura las materias del plan de estudios, contenidos y evaluaciones</p>
           <div class="card-actions">
-            <button class="btn-primary">Ver</button>
-            <button class="btn-secondary">Agregar</button>
+            <button class="btn-primary" (click)="navigateToSubjects()">Ver</button>
           </div>
         </div>
 
         <div class="workspace-card">
-          <div class="card-icon">🏫</div>
+          <div class="card-icon">📚</div>
           <h4>Cursos</h4>
+          <p>Administra los cursos académicos por nivel educativo y modalidad</p>
+          <div class="card-actions">
+            <button class="btn-primary" (click)="navigateToGrades()">Ver</button>
+          </div>
+        </div>
+
+        <div class="workspace-card">
+          <div class="card-icon">�</div>
+          <h4>Clases</h4>
           <p>Organiza los cursos por grado, sección y modalidad académica</p>
           <div class="card-actions">
             <button class="btn-primary">Ver</button>

@@ -13,4 +13,12 @@ export class WorkspaceComponent {
   navigateToRoles() {
     this.router.navigate(['/roles']);
   }
+
+  navigateToGrades() {
+    this.router.navigate(['/grades']);
+  }
+
+  navigateToSubjects() {
+    this.router.navigate(['/subjects']);
+  }
 }

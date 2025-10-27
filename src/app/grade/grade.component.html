@@ -1,0 +1,271 @@
+<div class="grade-container">
+  <div class="grade-header">
+    <div class="header-navigation">
+      <button class="btn-back" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+    </div>
+    <h2 class="grade-title">Gestión de Cursos</h2>
+    <p class="grade-subtitle">Administra los cursos del sistema académico</p>
+  </div>
+
+  <div class="grade-content">
+    <div class="grade-controls">
+      <div class="grade-actions">
+        <button class="btn-primary" (click)="openCreateModal()">Crear Curso</button>
+      </div>
+
+      <div class="grade-filters">
+        <div class="filter-dropdown">
+          <button class="dropdown-button" (click)="toggleDropdown()" [class.active]="isDropdownOpen">
+            <span class="dropdown-text">{{ selectedFilterLabel }}</span>
+            <i class="pi pi-chevron-down" [class.rotated]="isDropdownOpen"></i>
+          </button>
+
+          <div class="dropdown-menu" [class.show]="isDropdownOpen">
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'all'"
+              (click)="selectFilter('all', 'Todos los cursos')"
+            >
+              <i class="pi pi-list"></i>
+              <span>Todos los cursos</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'active'"
+              (click)="selectFilter('active', 'Cursos activos')"
+            >
+              <i class="pi pi-check-circle"></i>
+              <span>Cursos activos</span>
+            </button>
+            <button
+              class="dropdown-item"
+              [class.selected]="selectedFilter === 'inactive'"
+              (click)="selectFilter('inactive', 'Cursos inactivos')"
+            >
+              <i class="pi pi-times-circle"></i>
+              <span>Cursos inactivos</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="courses-list">
+      <div class="loading" *ngIf="isLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Cargando cursos...</span>
+      </div>
+
+      <div class="courses-grid" *ngIf="!isLoading && grades.length > 0">
+        <div class="course-card" *ngFor="let grade of grades">
+          <div class="card-header">
+            <div class="course-status-icon" [class]="grade.gradeStatus ? 'status-active' : 'status-inactive'">
+              <i class="pi" [class]="getStatusIcon(grade.gradeStatus)"></i>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-edit" data-tooltip="Editar" (click)="editGrade(grade)">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="deleteGrade(grade)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="course-title">{{ grade.gradeLevel }}</h3>
+            <p class="course-description">{{ grade.gradeDescription }}</p>
+          </div>
+
+          <div class="card-footer">
+            <span class="status-badge" [class]="grade.gradeStatus ? 'badge-active' : 'badge-inactive'">
+              {{ grade.gradeStatus ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <div class="empty-state" *ngIf="!isLoading && grades.length === 0">
+        <i class="pi pi-inbox"></i>
+        <h3>No se encontraron cursos</h3>
+        <p>No hay cursos disponibles con el filtro seleccionado.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar curso -->
+<div
+  class="modal-overlay"
+  *ngIf="isEditModalOpen"
+  (click)="closeEditModal()"
+  (keyup.escape)="closeEditModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Editar Curso</h3>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="gradeLevel">Curso:</label>
+        <input
+          type="text"
+          id="gradeLevel"
+          [(ngModel)]="editingGrade.gradeLevel"
+          class="form-input"
+          placeholder="Ej: 1ro Primaria, 3ro Secundaria"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="gradeDescription">Descripción:</label>
+        <input
+          type="text"
+          id="gradeDescription"
+          [(ngModel)]="editingGrade.gradeDescription"
+          class="form-input"
+          placeholder="Descripción del curso"
+        />
+      </div>
+
+      <div class="form-group">
+        <label class="toggle-label">
+          <input type="checkbox" [(ngModel)]="editingGrade.gradeStatus" class="toggle-input" />
+          <span class="toggle-slider"></span>
+          Estado: {{ editingGrade.gradeStatus ? 'Activo' : 'Inactivo' }}
+        </label>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveGrade()" [disabled]="isSaving">
+        <span *ngIf="!isSaving">Guardar</span>
+        <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner"></i> Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div
+  class="modal-overlay"
+  *ngIf="isDeleteModalOpen"
+  (click)="closeDeleteModal()"
+  (keyup.escape)="closeDeleteModal()"
+  tabindex="0"
+>
+  <div
+    class="modal-content delete-modal"
+    (click)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+    tabindex="0"
+  >
+    <div class="modal-header">
+      <h3>Confirmar Eliminación</h3>
+      <button class="modal-close" (click)="closeDeleteModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        ¿Estás seguro de que deseas eliminar el curso <strong>"{{ gradeToDelete?.gradeLevel }}"</strong>?
+      </p>
+      <p class="warning-text">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+      <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Eliminar</span>
+        <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear curso -->
+<div
+  class="modal-overlay"
+  *ngIf="isCreateModalOpen"
+  (click)="closeCreateModal()"
+  (keyup.escape)="closeCreateModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Crear Nuevo Curso</h3>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="newGradeLevel">Curso:</label>
+        <input
+          type="text"
+          id="newGradeLevel"
+          [(ngModel)]="newGrade.gradeLevel"
+          class="form-input"
+          placeholder="Ej: 1ro Primaria, 3ro Secundaria"
+          (keyup.enter)="createGrade()"
+        />
+      </div>
+
+      <div class="form-group">
+        <label for="newGradeDescription">Descripción:</label>
+        <input
+          type="text"
+          id="newGradeDescription"
+          [(ngModel)]="newGrade.gradeDescription"
+          class="form-input"
+          placeholder="Descripción del curso"
+          (keyup.enter)="createGrade()"
+        />
+      </div>
+
+      <div class="form-group">
+        <div class="info-message">
+          <i class="pi pi-info-circle"></i>
+          <span>Los nuevos cursos se crean como activos por defecto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+      <button
+        class="btn-primary"
+        (click)="createGrade()"
+        [disabled]="isCreating || !newGrade.gradeLevel.trim() || !newGrade.gradeDescription.trim()"
+      >
+        <span *ngIf="!isCreating">Crear Curso</span>
+        <span *ngIf="isCreating"><i class="pi pi-spin pi-spinner"></i> Creando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container" [class.show]="showToast">
+  <div class="toast" [class]="'toast-' + toastType">
+    <div class="toast-icon">
+      <i class="pi" [class]="getToastIcon()"></i>
+    </div>
+    <div class="toast-content">
+      <span>{{ toastMessage }}</span>
+    </div>
+    <button class="toast-close" (click)="hideToast()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+</div>
