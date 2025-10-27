@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-interface Grade {
+export interface Grade {
   gradeId?: number;
   id?: number; // Mantener para compatibilidad
   gradeLevel: string;

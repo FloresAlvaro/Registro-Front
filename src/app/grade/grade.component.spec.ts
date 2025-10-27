@@ -1,17 +1,21 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClientTesting } from '@angular/common/http/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideRouter } from '@angular/router';
 
-import { Grade } from './grade.component';
+import { GradeComponent } from './grade.component';
 
-describe('Grade', () => {
-  let component: Grade;
-  let fixture: ComponentFixture<Grade>;
+describe('GradeComponent', () => {
+  let component: GradeComponent;
+  let fixture: ComponentFixture<GradeComponent>;
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [Grade],
+      imports: [GradeComponent],
+      providers: [provideHttpClient(), provideHttpClientTesting(), provideRouter([])],
     }).compileComponents();
 
-    fixture = TestBed.createComponent(Grade);
+    fixture = TestBed.createComponent(GradeComponent);
     component = fixture.componentInstance;
     fixture.detectChanges();
   });

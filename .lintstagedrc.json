@@ -1,6 +1,5 @@
 {
   "src/**/*.{ts,html}": ["prettier --write"],
-  "src/**/*.{scss,css}": ["prettier --write"],
-  "src/**/*.json": ["prettier --write"],
+  "src/**/*.scss": ["prettier --write"],
   "*.{js,mjs}": ["prettier --write"]
 }

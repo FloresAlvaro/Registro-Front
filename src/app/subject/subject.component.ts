@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { FormsModule } from '@angular/forms';
 
-interface Subject {
+export interface Subject {
   subjectID?: number;
   id?: number; // Mantener para compatibilidad
   subjectName: string;
