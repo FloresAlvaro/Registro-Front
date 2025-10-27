@@ -44,6 +44,16 @@ export class RoleComponent implements OnInit {
   roleToDelete: Role | null = null;
   isDeleting = false;
 
+  // Modal de creación
+  isCreateModalOpen = false;
+  newRole: Role = { roleName: '', roleStatus: true };
+  isCreating = false;
+
+  // Toast notifications
+  toastMessage = '';
+  toastType: 'success' | 'error' | 'info' = 'info';
+  showToast = false;
+
   // URL base del endpoint
   private readonly baseUrl = 'http://localhost:3000/roles';
 
@@ -200,6 +210,10 @@ export class RoleComponent implements OnInit {
       // Recargar los roles para asegurar sincronización
       await this.loadRoles();
       this.closeEditModal();
+      this.showToastNotification(
+        `Rol "${this.editingRole.roleName}" actualizado exitosamente`,
+        'success'
+      );
     } catch (error) {
       this.handleSaveError(error);
     } finally {
@@ -211,15 +225,18 @@ export class RoleComponent implements OnInit {
     const httpError = error as { status?: number; error?: unknown };
 
     if (httpError?.status === 404) {
-      alert('El rol no fue encontrado. Puede haber sido eliminado.');
+      this.showToastNotification('El rol no fue encontrado. Puede haber sido eliminado.', 'error');
       this.loadRoles();
       this.closeEditModal();
     } else if (httpError?.status === 400) {
-      alert('Datos inválidos. Verifica el nombre del rol.');
+      this.showToastNotification('Datos inválidos. Verifica el nombre del rol.', 'error');
     } else if (httpError?.status === 403) {
-      alert('No tienes permisos para editar este rol.');
+      this.showToastNotification('No tienes permisos para editar este rol.', 'error');
     } else {
-      alert('Error al guardar el rol. Por favor, inténtalo de nuevo.');
+      this.showToastNotification(
+        'Error al guardar el rol. Por favor, inténtalo de nuevo.',
+        'error'
+      );
     }
   }
 
@@ -243,7 +260,9 @@ export class RoleComponent implements OnInit {
 
       // Recargar la lista de roles después de eliminar exitosamente
       await this.loadRoles();
+      const deletedRoleName = this.roleToDelete?.roleName || 'el rol';
       this.closeDeleteModal();
+      this.showToastNotification(`Rol "${deletedRoleName}" eliminado exitosamente`, 'success');
     } catch (error) {
       // Manejar errores específicos del servidor
       this.handleDeleteError(error);
@@ -265,10 +284,13 @@ export class RoleComponent implements OnInit {
       this.closeDeleteModal();
     } else if (httpError?.status === 403) {
       // Sin permisos para eliminar
-      alert('No tienes permisos para eliminar este rol');
+      this.showToastNotification('No tienes permisos para eliminar este rol', 'error');
     } else {
       // Otro error del servidor
-      alert('Error al eliminar el rol. Por favor, inténtalo de nuevo.');
+      this.showToastNotification(
+        'Error al eliminar el rol. Por favor, inténtalo de nuevo.',
+        'error'
+      );
     }
   }
 
@@ -278,6 +300,86 @@ export class RoleComponent implements OnInit {
       // Eliminar de la lista local para testing
       this.roles = this.roles.filter((role) => (role.roleId || role.id) !== roleIdToDelete);
       this.closeDeleteModal();
+    }
+  }
+
+  // Métodos del modal de creación
+  openCreateModal() {
+    this.newRole = { roleName: '', roleStatus: true };
+    this.isCreateModalOpen = true;
+  }
+
+  closeCreateModal() {
+    this.isCreateModalOpen = false;
+    this.newRole = { roleName: '', roleStatus: true };
+  }
+
+  async createRole() {
+    if (!this.newRole.roleName.trim()) {
+      this.showToastNotification('El nombre del rol es obligatorio', 'error');
+      return;
+    }
+
+    this.isCreating = true;
+    try {
+      const roleData = {
+        roleName: this.newRole.roleName.trim(),
+        roleStatus: true, // Siempre true como especificaste
+      };
+
+      const response = await this.http.post<Role>(this.baseUrl, roleData).toPromise();
+
+      if (response) {
+        this.showToastNotification(`Rol "${response.roleName}" creado exitosamente`, 'success');
+        await this.loadRoles();
+        this.closeCreateModal();
+      }
+    } catch (error) {
+      this.handleCreateError(error);
+    } finally {
+      this.isCreating = false;
+    }
+  }
+
+  private handleCreateError(error: unknown) {
+    const httpError = error as { status?: number; error?: unknown };
+
+    if (httpError?.status === 400) {
+      this.showToastNotification('Datos inválidos. Verifica el nombre del rol.', 'error');
+    } else if (httpError?.status === 409) {
+      this.showToastNotification('Ya existe un rol con ese nombre.', 'error');
+    } else if (httpError?.status === 403) {
+      this.showToastNotification('No tienes permisos para crear roles.', 'error');
+    } else {
+      this.showToastNotification('Error al crear el rol. Por favor, inténtalo de nuevo.', 'error');
+    }
+  }
+
+  // Métodos de toast notifications
+  showToastNotification(message: string, type: 'success' | 'error' | 'info') {
+    this.toastMessage = message;
+    this.toastType = type;
+    this.showToast = true;
+
+    // Auto-hide después de 4 segundos
+    setTimeout(() => {
+      this.hideToast();
+    }, 4000);
+  }
+
+  hideToast() {
+    this.showToast = false;
+  }
+
+  getToastIcon(): string {
+    switch (this.toastType) {
+      case 'success':
+        return 'pi-check-circle';
+      case 'error':
+        return 'pi-exclamation-triangle';
+      case 'info':
+      default:
+        return 'pi-info-circle';
     }
   }
 

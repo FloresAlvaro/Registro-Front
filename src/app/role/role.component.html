@@ -12,7 +12,7 @@
   <div class="role-content">
     <div class="role-controls">
       <div class="role-actions">
-        <button class="btn-primary">Crear Rol</button>
+        <button class="btn-primary" (click)="openCreateModal()">Crear Rol</button>
       </div>
 
       <div class="role-filters">
@@ -187,5 +187,67 @@
         <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
       </button>
     </div>
+  </div>
+</div>
+
+<!-- Modal para crear rol -->
+<div
+  class="modal-overlay"
+  *ngIf="isCreateModalOpen"
+  (click)="closeCreateModal()"
+  (keyup.escape)="closeCreateModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Crear Nuevo Rol</h3>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="newRoleName">Nombre del Rol:</label>
+        <input
+          type="text"
+          id="newRoleName"
+          [(ngModel)]="newRole.roleName"
+          class="form-input"
+          placeholder="Ingrese el nombre del nuevo rol"
+          (keyup.enter)="createRole()"
+        />
+      </div>
+
+      <div class="form-group">
+        <div class="info-message">
+          <i class="pi pi-info-circle"></i>
+          <span>Los nuevos roles se crean como activos por defecto</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+      <button class="btn-primary" (click)="createRole()" [disabled]="isCreating || !newRole.roleName.trim()">
+        <span *ngIf="!isCreating">Crear Rol</span>
+        <span *ngIf="isCreating"><i class="pi pi-spin pi-spinner"></i> Creando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container" [class.show]="showToast">
+  <div class="toast" [class]="'toast-' + toastType">
+    <div class="toast-icon">
+      <i class="pi" [class]="getToastIcon()"></i>
+    </div>
+    <div class="toast-content">
+      <span>{{ toastMessage }}</span>
+    </div>
+    <button class="toast-close" (click)="hideToast()">
+      <i class="pi pi-times"></i>
+    </button>
   </div>
 </div>
