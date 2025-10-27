@@ -1,0 +1,43 @@
+<!-- Formulario de edición -->
+<div slot="edit-form">
+  <div class="form-group">
+    <label for="roleName">Nombre del Rol:</label>
+    <input
+      type="text"
+      id="roleName"
+      [(ngModel)]="editingEntity.roleName"
+      class="form-input"
+      placeholder="Ingrese el nombre del rol"
+    />
+  </div>
+
+  <div class="form-group">
+    <label class="toggle-label">
+      <input type="checkbox" [(ngModel)]="editingEntity.roleStatus" class="toggle-input" />
+      <span class="toggle-slider"></span>
+      Estado: {{ editingEntity.roleStatus ? 'Activo' : 'Inactivo' }}
+    </label>
+  </div>
+</div>
+
+<!-- Formulario de creación -->
+<div slot="create-form">
+  <div class="form-group">
+    <label for="newRoleName">Nombre del Rol:</label>
+    <input
+      type="text"
+      id="newRoleName"
+      [(ngModel)]="newEntity.roleName"
+      class="form-input"
+      placeholder="Ingrese el nombre del nuevo rol"
+      (keyup.enter)="createEntity()"
+    />
+  </div>
+
+  <div class="form-group">
+    <div class="info-message">
+      <i class="pi pi-info-circle"></i>
+      <span>Los nuevos roles se crean como activos por defecto</span>
+    </div>
+  </div>
+</div>

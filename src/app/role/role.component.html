@@ -1,253 +1,46 @@
-<div class="role-container">
-  <div class="role-header">
-    <div class="header-navigation">
-      <button class="btn-back" (click)="goBack()">
-        <i class="pi pi-arrow-left"></i>
-      </button>
+<!-- Usa el template base con slot content para formularios -->
+<ng-container>
+  <!-- Formulario de edición -->
+  <div slot="edit-form">
+    <div class="form-group">
+      <label for="roleName">Nombre del Rol:</label>
+      <input
+        type="text"
+        id="roleName"
+        [(ngModel)]="editingEntity.roleName"
+        class="form-input"
+        placeholder="Ingrese el nombre del rol"
+      />
     </div>
-    <h2 class="role-title">Gestión de Roles</h2>
-    <p class="role-subtitle">Administra los roles del sistema y sus permisos</p>
+
+    <div class="form-group">
+      <label class="toggle-label">
+        <input type="checkbox" [(ngModel)]="editingEntity.roleStatus" class="toggle-input" />
+        <span class="toggle-slider"></span>
+        Estado: {{ editingEntity.roleStatus ? 'Activo' : 'Inactivo' }}
+      </label>
+    </div>
   </div>
 
-  <div class="role-content">
-    <div class="role-controls">
-      <div class="role-actions">
-        <button class="btn-primary" (click)="openCreateModal()">Crear Rol</button>
-      </div>
-
-      <div class="role-filters">
-        <div class="filter-dropdown">
-          <button class="dropdown-button" (click)="toggleDropdown()" [class.active]="isDropdownOpen">
-            <span class="dropdown-text">{{ selectedFilterLabel }}</span>
-            <i class="pi pi-chevron-down" [class.rotated]="isDropdownOpen"></i>
-          </button>
-
-          <div class="dropdown-menu" [class.show]="isDropdownOpen">
-            <button
-              class="dropdown-item"
-              [class.selected]="selectedFilter === 'all'"
-              (click)="selectFilter('all', 'Todos los roles')"
-            >
-              <i class="pi pi-list"></i>
-              <span>Todos los roles</span>
-            </button>
-            <button
-              class="dropdown-item"
-              [class.selected]="selectedFilter === 'active'"
-              (click)="selectFilter('active', 'Roles activos')"
-            >
-              <i class="pi pi-check-circle"></i>
-              <span>Roles activos</span>
-            </button>
-            <button
-              class="dropdown-item"
-              [class.selected]="selectedFilter === 'inactive'"
-              (click)="selectFilter('inactive', 'Roles inactivos')"
-            >
-              <i class="pi pi-times-circle"></i>
-              <span>Roles inactivos</span>
-            </button>
-          </div>
-        </div>
-      </div>
+  <!-- Formulario de creación -->
+  <div slot="create-form">
+    <div class="form-group">
+      <label for="newRoleName">Nombre del Rol:</label>
+      <input
+        type="text"
+        id="newRoleName"
+        [(ngModel)]="newEntity.roleName"
+        class="form-input"
+        placeholder="Ingrese el nombre del nuevo rol"
+        (keyup.enter)="createEntity()"
+      />
     </div>
 
-    <div class="roles-list">
-      <div class="loading" *ngIf="isLoading">
-        <i class="pi pi-spin pi-spinner"></i>
-        <span>Cargando roles...</span>
-      </div>
-
-      <div class="roles-table" *ngIf="!isLoading && roles.length > 0">
-        <div class="table-header">
-          <div class="header-cell name">Nombre del Rol</div>
-          <div class="header-cell status">Estado</div>
-          <div class="header-cell actions">Acciones</div>
-        </div>
-
-        <div class="table-body">
-          <div class="table-row" *ngFor="let role of roles">
-            <div class="table-cell name">
-              <div class="role-name-container">
-                <div class="role-status-icon" [class]="role.roleStatus ? 'status-active' : 'status-inactive'">
-                  <i class="pi" [class]="getStatusIcon(role.roleStatus)"></i>
-                </div>
-                <span class="role-name">{{ role.roleName }}</span>
-              </div>
-            </div>
-
-            <div class="table-cell status">
-              <span class="status-badge" [class]="role.roleStatus ? 'badge-active' : 'badge-inactive'">
-                {{ role.roleStatus ? 'Activo' : 'Inactivo' }}
-              </span>
-            </div>
-
-            <div class="table-cell actions">
-              <div class="action-buttons">
-                <button class="btn-action btn-edit" data-tooltip="Editar" (click)="editRole(role)">
-                  <i class="pi pi-pencil"></i>
-                </button>
-                <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="deleteRole(role)">
-                  <i class="pi pi-trash"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div class="empty-state" *ngIf="!isLoading && roles.length === 0">
-        <i class="pi pi-inbox"></i>
-        <h3>No se encontraron roles</h3>
-        <p>No hay roles disponibles con el filtro seleccionado.</p>
+    <div class="form-group">
+      <div class="info-message">
+        <i class="pi pi-info-circle"></i>
+        <span>Los nuevos roles se crean como activos por defecto</span>
       </div>
     </div>
   </div>
-</div>
-
-<!-- Modal para editar rol -->
-<div
-  class="modal-overlay"
-  *ngIf="isEditModalOpen"
-  (click)="closeEditModal()"
-  (keyup.escape)="closeEditModal()"
-  tabindex="0"
->
-  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
-    <div class="modal-header">
-      <h3>Editar Rol</h3>
-      <button class="modal-close" (click)="closeEditModal()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="roleName">Nombre del Rol:</label>
-        <input
-          type="text"
-          id="roleName"
-          [(ngModel)]="editingRole.roleName"
-          class="form-input"
-          placeholder="Ingrese el nombre del rol"
-        />
-      </div>
-
-      <div class="form-group">
-        <label class="toggle-label">
-          <input type="checkbox" [(ngModel)]="editingRole.roleStatus" class="toggle-input" />
-          <span class="toggle-slider"></span>
-          Estado: {{ editingRole.roleStatus ? 'Activo' : 'Inactivo' }}
-        </label>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
-      <button class="btn-primary" (click)="saveRole()" [disabled]="isSaving">
-        <span *ngIf="!isSaving">Guardar</span>
-        <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner"></i> Guardando...</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal de confirmación para eliminar -->
-<div
-  class="modal-overlay"
-  *ngIf="isDeleteModalOpen"
-  (click)="closeDeleteModal()"
-  (keyup.escape)="closeDeleteModal()"
-  tabindex="0"
->
-  <div
-    class="modal-content delete-modal"
-    (click)="$event.stopPropagation()"
-    (keyup)="$event.stopPropagation()"
-    tabindex="0"
-  >
-    <div class="modal-header">
-      <h3>Confirmar Eliminación</h3>
-      <button class="modal-close" (click)="closeDeleteModal()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <p>
-        ¿Estás seguro de que deseas eliminar el rol <strong>"{{ roleToDelete?.roleName }}"</strong>?
-      </p>
-      <p class="warning-text">Esta acción no se puede deshacer.</p>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
-      <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
-        <span *ngIf="!isDeleting">Eliminar</span>
-        <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal para crear rol -->
-<div
-  class="modal-overlay"
-  *ngIf="isCreateModalOpen"
-  (click)="closeCreateModal()"
-  (keyup.escape)="closeCreateModal()"
-  tabindex="0"
->
-  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
-    <div class="modal-header">
-      <h3>Crear Nuevo Rol</h3>
-      <button class="modal-close" (click)="closeCreateModal()">
-        <i class="pi pi-times"></i>
-      </button>
-    </div>
-
-    <div class="modal-body">
-      <div class="form-group">
-        <label for="newRoleName">Nombre del Rol:</label>
-        <input
-          type="text"
-          id="newRoleName"
-          [(ngModel)]="newRole.roleName"
-          class="form-input"
-          placeholder="Ingrese el nombre del nuevo rol"
-          (keyup.enter)="createRole()"
-        />
-      </div>
-
-      <div class="form-group">
-        <div class="info-message">
-          <i class="pi pi-info-circle"></i>
-          <span>Los nuevos roles se crean como activos por defecto</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="modal-footer">
-      <button class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
-      <button class="btn-primary" (click)="createRole()" [disabled]="isCreating || !newRole.roleName.trim()">
-        <span *ngIf="!isCreating">Crear Rol</span>
-        <span *ngIf="isCreating"><i class="pi pi-spin pi-spinner"></i> Creando...</span>
-      </button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast Notifications -->
-<div class="toast-container" [class.show]="showToast">
-  <div class="toast" [class]="'toast-' + toastType">
-    <div class="toast-icon">
-      <i class="pi" [class]="getToastIcon()"></i>
-    </div>
-    <div class="toast-content">
-      <span>{{ toastMessage }}</span>
-    </div>
-    <button class="toast-close" (click)="hideToast()">
-      <i class="pi pi-times"></i>
-    </button>
-  </div>
-</div>
+</ng-container>

@@ -1,0 +1,242 @@
+<div class="entity-container">
+  <div class="entity-header">
+    <div class="header-navigation">
+      <button class="btn-back" (click)="goBack()">
+        <i class="pi pi-arrow-left"></i>
+      </button>
+    </div>
+    <h2 class="entity-title">{{ config.entityName }}</h2>
+    <p class="entity-subtitle">
+      {{ config.subtitle || 'Administra ' + config.entityPluralName.toLowerCase() + ' del sistema' }}
+    </p>
+  </div>
+
+  <div class="entity-content">
+    <div class="entity-controls">
+      <div class="entity-actions">
+        <button class="btn-primary" (click)="openCreateModal()">
+          {{ config.createButtonLabel || 'Crear ' + config.entityName }}
+        </button>
+      </div>
+
+      <div class="entity-filters">
+        <div class="filter-dropdown">
+          <button class="dropdown-button" (click)="toggleDropdown()" [class.active]="isDropdownOpen">
+            <span class="dropdown-text">{{ selectedFilterLabel }}</span>
+            <i class="pi pi-chevron-down" [class.rotated]="isDropdownOpen"></i>
+          </button>
+
+          <div class="dropdown-menu" [class.show]="isDropdownOpen">
+            <button
+              class="dropdown-item"
+              *ngFor="let option of filterOptions"
+              [class.selected]="selectedFilter === option.value"
+              (click)="selectFilter(option.value, option.label)"
+            >
+              <i class="pi" [class]="option.icon"></i>
+              <span>{{ option.label }}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="entities-list">
+      <!-- Loading State -->
+      <div class="loading" *ngIf="isLoading">
+        <i class="pi pi-spin pi-spinner"></i>
+        <span>Cargando {{ config.entityPluralName.toLowerCase() }}...</span>
+      </div>
+
+      <!-- Table Layout (for Role) -->
+      <div class="entities-table" *ngIf="!isLoading && hasEntities && config.layout === 'table'">
+        <div class="table-header">
+          <div class="header-cell name">{{ config.tableHeaders?.name || 'Nombre' }}</div>
+          <div class="header-cell status">{{ config.tableHeaders?.status || 'Estado' }}</div>
+          <div class="header-cell actions">{{ config.tableHeaders?.actions || 'Acciones' }}</div>
+        </div>
+
+        <div class="table-body">
+          <div class="table-row" *ngFor="let entity of entities">
+            <div class="table-cell name">
+              <div class="entity-name-container">
+                <div class="entity-status-icon" [class]="getEntityStatus(entity) ? 'status-active' : 'status-inactive'">
+                  <i class="pi" [class]="getStatusIcon(getEntityStatus(entity))"></i>
+                </div>
+                <span class="entity-name">{{ getEntityName(entity) }}</span>
+              </div>
+            </div>
+
+            <div class="table-cell status">
+              <span class="status-badge" [class]="getEntityStatus(entity) ? 'badge-active' : 'badge-inactive'">
+                {{ getEntityStatus(entity) ? 'Activo' : 'Inactivo' }}
+              </span>
+            </div>
+
+            <div class="table-cell actions">
+              <div class="action-buttons">
+                <button class="btn-action btn-edit" data-tooltip="Editar" (click)="openEditModal(entity)">
+                  <i class="pi pi-pencil"></i>
+                </button>
+                <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="openDeleteModal(entity)">
+                  <i class="pi pi-trash"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid Layout (for Grade & Subject) -->
+      <div class="entities-grid" *ngIf="!isLoading && hasEntities && config.layout === 'grid'">
+        <div class="entity-card" *ngFor="let entity of entities">
+          <div class="card-header">
+            <div class="entity-status-icon" [class]="getEntityStatus(entity) ? 'status-active' : 'status-inactive'">
+              <i class="pi" [class]="getStatusIcon(getEntityStatus(entity))"></i>
+            </div>
+            <div class="card-actions">
+              <button class="btn-action btn-edit" data-tooltip="Editar" (click)="openEditModal(entity)">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="btn-action btn-delete" data-tooltip="Eliminar" (click)="openDeleteModal(entity)">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <h3 class="entity-title">{{ getEntityName(entity) }}</h3>
+            <p class="entity-description" *ngIf="getEntityDescription(entity)">{{ getEntityDescription(entity) }}</p>
+          </div>
+
+          <div class="card-footer">
+            <span class="status-badge" [class]="getEntityStatus(entity) ? 'badge-active' : 'badge-inactive'">
+              {{ getEntityStatus(entity) ? 'Activo' : 'Inactivo' }}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty State -->
+      <div class="empty-state" *ngIf="!isLoading && !hasEntities">
+        <i class="pi pi-inbox"></i>
+        <h3>No se encontraron {{ config.entityPluralName.toLowerCase() }}</h3>
+        <p>No hay {{ config.entityPluralName.toLowerCase() }} disponibles con el filtro seleccionado.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para editar -->
+<div
+  class="modal-overlay"
+  *ngIf="isEditModalOpen"
+  (click)="closeEditModal()"
+  (keyup.escape)="closeEditModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Editar {{ config.entityName }}</h3>
+      <button class="modal-close" (click)="closeEditModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <ng-content select="[slot=edit-form]"></ng-content>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeEditModal()">Cancelar</button>
+      <button class="btn-primary" (click)="saveEntity()" [disabled]="isSaving">
+        <span *ngIf="!isSaving">Guardar</span>
+        <span *ngIf="isSaving"><i class="pi pi-spin pi-spinner"></i> Guardando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal de confirmación para eliminar -->
+<div
+  class="modal-overlay"
+  *ngIf="isDeleteModalOpen"
+  (click)="closeDeleteModal()"
+  (keyup.escape)="closeDeleteModal()"
+  tabindex="0"
+>
+  <div
+    class="modal-content delete-modal"
+    (click)="$event.stopPropagation()"
+    (keyup)="$event.stopPropagation()"
+    tabindex="0"
+  >
+    <div class="modal-header">
+      <h3>Confirmar Eliminación</h3>
+      <button class="modal-close" (click)="closeDeleteModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <p>
+        ¿Estás seguro de que deseas eliminar {{ config.entityGender === 'f' ? 'la' : 'el' }}
+        {{ config.entityName.toLowerCase() }} <strong>"{{ getEntityName(entityToDelete) }}"</strong>?
+      </p>
+      <p class="warning-text">Esta acción no se puede deshacer.</p>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeDeleteModal()">Cancelar</button>
+      <button class="btn-danger" (click)="confirmDelete()" [disabled]="isDeleting">
+        <span *ngIf="!isDeleting">Eliminar</span>
+        <span *ngIf="isDeleting"><i class="pi pi-spin pi-spinner"></i> Eliminando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal para crear -->
+<div
+  class="modal-overlay"
+  *ngIf="isCreateModalOpen"
+  (click)="closeCreateModal()"
+  (keyup.escape)="closeCreateModal()"
+  tabindex="0"
+>
+  <div class="modal-content" (click)="$event.stopPropagation()" (keyup)="$event.stopPropagation()" tabindex="0">
+    <div class="modal-header">
+      <h3>Crear {{ config.entityName }}</h3>
+      <button class="modal-close" (click)="closeCreateModal()">
+        <i class="pi pi-times"></i>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <ng-content select="[slot=create-form]"></ng-content>
+    </div>
+
+    <div class="modal-footer">
+      <button class="btn-secondary" (click)="closeCreateModal()">Cancelar</button>
+      <button class="btn-primary" (click)="createEntity()" [disabled]="isCreating">
+        <span *ngIf="!isCreating">Crear {{ config.entityName }}</span>
+        <span *ngIf="isCreating"><i class="pi pi-spin pi-spinner"></i> Creando...</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notifications -->
+<div class="toast-container" [class.show]="notificationServiceRef.showToast">
+  <div class="toast" [class]="'toast-' + notificationServiceRef.toastMessage.type">
+    <div class="toast-icon">
+      <i class="pi" [class]="notificationServiceRef.toastMessage.icon"></i>
+    </div>
+    <div class="toast-content">
+      <span>{{ notificationServiceRef.toastMessage.message }}</span>
+    </div>
+    <button class="toast-close" (click)="hideToast()">
+      <i class="pi pi-times"></i>
+    </button>
+  </div>
+</div>
